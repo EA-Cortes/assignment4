@@ -2,9 +2,6 @@
 #include<stdio.h>
 #include<string.h>
 
-void createTask();
-void getTask();
-
 // AVL Tree node
 typedef struct Node{
 	int key;
