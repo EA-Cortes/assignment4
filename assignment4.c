@@ -6,7 +6,6 @@
 typedef struct Node{
 	int key;
 	char* taskName;
-
 	struct Node *left;
 	struct Node *right;
 	int height;
@@ -16,32 +15,33 @@ typedef struct Node{
 int height(Node *node);
 int getBal(Node *node);
 int max(int a, int b);
-Node *insert(Node *node, int key, char *string);
-Node *newNode(int key, char *string);
+Node * insert(Node *node, int key, char *string);
+Node * newNode(int key, char *string);
 Node * search(Node *node, int key);
-Node *rightRotate(Node *y);
-Node *leftRotate(Node *x);
-void getInputs(int n, Node *node);
+Node * rightRotate(Node *y);
+Node * leftRotate(Node *x);
+Node * getInputs(int n, Node *node);
 void inOrder(Node *node);
 
 int main(){
 	int n = 0;
 	Node *root = NULL;
 	scanf("%d", &n);
-  getInputs(n, root);
+  root = getInputs(n, root);
 
-  printf("\nIn Order Traversal of values in tree:\n");
   inOrder(root);
 }
 
 // Create new node, malloc its memory, init its values
 Node *newNode(int key, char *string){
   Node *node = (Node*)malloc(sizeof(Node));
+  node->taskName = (char *)malloc(sizeof(char) * 20);
   node->key = key;
   node->taskName = string;
   node->left = NULL;
   node->right = NULL;
   node->height = 1;
+  printf("New task: %s Priority: %d\n", node->taskName, node->key);
   return node;
 }
 
@@ -65,7 +65,7 @@ Node *insert(Node *node, int key, char *string){
   }else if(key > node->key){
     node->right = insert(node->right, key, string);
   }else{
-    return node;
+    // return node;
   }
 
   // Update height
@@ -164,20 +164,26 @@ int getBal(Node *node){
 void inOrder(Node *node){
   if(node != NULL){
     inOrder(node->left);
-    printf("%d ", node->key);
+    printf("%d\n", node->key);
     inOrder(node->right);
   }
 }
 
 
-void getInputs(int n, Node *node){
+Node* getInputs(int n, Node *node){
   int i = 0, state = 0, tempKey = 0;
   if(n == 0){
     printf("No input\n");
   }else{
     for(i = 0; i < n; i++){
+      state = 0;
       scanf("%d", &state);
-
+      
+      // Input sanitizer
+      while(state != 1 && state != 2){
+        scanf("%d", &state);
+      }
+  
       if(state == 1){
         char *tempName = (char *)malloc(sizeof(char) * 20);
         scanf("%s %d", tempName, &tempKey);
@@ -190,4 +196,92 @@ void getInputs(int n, Node *node){
       }
     }
   }
+  return node;
 }
+
+// --------------- Test Cases ---------------
+/*
+// Input
+15
+1 F 9 
+1 A 1
+1 I 7
+1 H 8
+1 D 4
+1 C 3
+1 E 5
+1 B 2
+1 J 6
+1 E 5
+2 3
+2 5
+2 10
+2 4
+2 3 
+
+// Output 
+
+ADDED
+ADDED
+ADDED
+ADDED
+ADDED
+ADDED
+ADDED
+ADDED
+ADDED
+REDUNDANT
+C
+E
+NON-EXISTANT
+D
+C
+
+
+// Case 2
+// Input
+13
+1 ProgramOne 1
+1 BoiledWater 2
+1 ColdFerret 3
+1 ProgramOne 1
+1 ProgramOne 1
+1 MoonsShadow 7
+1 ThatOtherProgram 6
+2 3
+2 5
+2 10
+2 4
+2 3
+2 2
+
+// Output
+ADDED
+ADDED
+ADDED
+REDUNDANT
+REDUNDANT
+ADDED
+ADDED
+ColdFerret
+NON-EXISTANT
+NON-EXISTANT
+NON-EXISTANT
+ColdFerret
+BoiledWater
+
+// Case 3
+1 2
+1 ProgramOne 1 
+2 1
+2 2
+2 100
+1 ProgramTwo 2
+2 1
+2 2
+2 100
+1 ProgramThree 100 
+2 1
+2 2
+2 100
+*/
