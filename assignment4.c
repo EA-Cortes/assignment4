@@ -1,202 +1,192 @@
+// UCF Summer 2018
+// COP3502 - Professor Travis Meade
+// Task Manager AVL Tree by Efrain Alejandro Cortes
+
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
 
-// AVL Tree node
+// AVL Tree Node struct
 typedef struct Node{
 	int key;
 	char* taskName;
-	struct Node *left;
-	struct Node *right;
+	struct Node* left;
+	struct Node* right;
 	int height;
-
 }Node;
+
+// ---------------------- Function declarations ----------------------
+Node* getInputs(int n, Node *node);
+Node* insert(Node *node, int key, char *string);
+Node* newNode(int key, char *string);
+Node* search(Node *node, int key);
+Node* rightRotate(Node *y);
+Node* leftRotate(Node *x);
 
 int height(Node *node);
 int getBal(Node *node);
 int max(int a, int b);
-Node * insert(Node *node, int key, char *string);
-Node * newNode(int key, char *string);
-Node * search(Node *node, int key);
-Node * rightRotate(Node *y);
-Node * leftRotate(Node *x);
-Node * getInputs(int n, Node *node);
-void inOrder(Node *node);
 
+// ---------------------- Main ----------------------
 int main(){
 	int n = 0;
 	Node *root = NULL;
 	scanf("%d", &n);
-  root = getInputs(n, root);
+	root = getInputs(n, root);
 }
 
-// Create new node, malloc its memory, init its values
-Node *newNode(int key, char *string){
-  Node *node = (Node*)malloc(sizeof(Node));
-  node->taskName = (char *)malloc(sizeof(char) * 20);
-  node->key = key;
-  strcpy(node->taskName, string);
-  node->left = NULL;
-  node->right = NULL;
-  node->height = 1;
-  // printf("New task: %s Priority: %d\n", node->taskName, node->key);
-  return node;
+// ---------------------- Function Definitions ----------------------
+
+//	Creates a new node inside AVL tree, mallocs its memory, stores its values from user input 
+Node* newNode(int key, char* string){
+	Node *node = (Node*)malloc(sizeof(Node));
+	node->taskName = (char *)malloc(sizeof(char) * 20);
+	node->key = key;
+	strcpy(node->taskName, string);
+	node->left = NULL;
+	node->right = NULL;
+	node->height = 1;
+	return node;
 }
 
-// Function that inserts and balances new nodes simultaneously
-// Node Parameters: 19 char string, int priority
+//	Inserts user input into AVL tree, simultaneously balancing it
 Node *insert(Node *node, int key, char *string){
-  // If node is empty, successfully add
-  if(node == NULL){    
-    printf("ADDED\n");
-    // printf("ADDED %d: %s\n", key, string);
-    return newNode(key, string);
+	if(node == NULL){
+		printf("ADDED\n");
+		return newNode(key, string);
+	}
 
-  }
-  // If node already exists
-  if(key == node->key){
-    printf("REDUNDANT\n");
-  }
+	if(key == node->key){
+		printf("REDUNDANT\n");
+	}
 
-  if(key < node->key){
-    node->left = insert(node->left, key, string);
-  }else if(key > node->key){
-    node->right = insert(node->right, key, string);
-  }else{
+	if(key < node->key){
+    	node->left = insert(node->left, key, string);
+	}else if(key > node->key){
+		node->right = insert(node->right, key, string);
+	}else{
     // return node;
-  }
+	}
 
-  // Update height
-    node->height = 1 + max(height(node->left), height(node->right));
+	// Update height
+	node->height = 1 + max(height(node->left), height(node->right));
 
-  // deal with unbalanced tree cases
-    int balance = getBal(node);
+	// Check the balance factor of the new node
+	int balance = getBal(node);
 
-    // LL Rotate
-    if(balance > 1 && key < node->left->key) return rightRotate(node);
+	// LL Rotate
+	if(balance > 1 && key < node->left->key) return rightRotate(node);
     
-    // RR Rotate
-    if(balance < -1 && key > node->right->key) return leftRotate(node);
+	// RR Rotate
+	if(balance < -1 && key > node->right->key) return leftRotate(node);
     
-    // LR Rotate
-    if(balance > 1 && key > node->left->key){
-      node->left = leftRotate(node->left);
-      return rightRotate(node);
+	// LR Rotate
+	if(balance > 1 && key > node->left->key){
+    	node->left = leftRotate(node->left);
+    	return rightRotate(node);
     }
     
-    // RL Rotate
+	// RL Rotate
     if(balance < -1 && key < node->right->key){
-      node->right = rightRotate(node->right);
-      return leftRotate(node);
+    	node->right = rightRotate(node->right);
+    	return leftRotate(node);
     }
-
-    return node;
+	return node;
 }
 
+//	Function to search through the AVL tree by key, and output the taskName stored in node
 Node *search(Node *node, int key){
-  if(node == NULL){
-    printf("NON-EXISTANT\n");
-    return node;
-  }else if(node->key == key){
-    if(node->taskName != NULL){
-      printf("%s\n", node->taskName);
-    }
-  }
+	if(node == NULL){
+    	printf("NON-EXISTANT\n");
+    	return node;
+	}else if(node->key == key){
+		if(node->taskName != NULL){
+			printf("%s\n", node->taskName);
+    	}
+  	}
 
-
-  if(key < node->key){
-      return search(node->left, key);
-  }else if(key > node->key){
-     return search(node->right, key);
-  }
-  return node;
+	if(key < node->key){
+		return search(node->left, key);
+	}else if(key > node->key){
+		return search(node->right, key);
+	}
+	return node;
 }
 
-
-// Utility function that rotates to the right
+//	Utility function that rotates node to the right
 Node *rightRotate(Node *y){
-  Node *x = y->left;
-  Node *T2 = x->right;
+	Node *x = y->left;
+	Node *T2 = x->right;
 
-  x->right = y;
-  y->left = T2;
+	x->right = y;
+	y->left = T2;
 
-  y->height = max(height(y->left), height(y->right))+1;
-  x->height = max(height(x->left), height(x->right))+1;
+	y->height = max(height(y->left), height(y->right))+1;
+	x->height = max(height(x->left), height(x->right))+1;
 
-  return x;
+	return x;
 }
 
-// Utility function that rotates to the left
+//	Utility function that rotates node to the left
 Node *leftRotate(Node *x){
-  Node *y = x->right;
-  Node *T2 = y->left;
+	Node *y = x->right;
+	Node *T2 = y->left;
 
-  y->left = x;
-  x->right = T2;
+	y->left = x;
+	x->right = T2;
 
-  x->height = max(height(x->left), height(x->right))+1;
-  y->height = max(height(y->left), height(y->right))+1;
+	x->height = max(height(x->left), height(x->right))+1;
+	y->height = max(height(y->left), height(y->right))+1;
 
-  return y;
+	return y;
 }
 
-// Utility function to see which of two values is greater
+//	Utility function to see which of two values is greater
 int max(int a, int b){
-  return (a > b) ? a : b;
+	return (a > b) ? a : b;
 }
 
+//	Utility function to get the height of a node
 int height(Node *node){
-  return (node == NULL) ? 0 : node->height;
+	return (node == NULL) ? 0 : node->height;
 }
 
-// Utility function to get the balance favtor of a Node
+//	Utility function to get the balance favtor of a Node
 int getBal(Node *node){
-  if(node == NULL){
-    return 0;
-  }
-  return height(node->left) - height(node->right);
+	if(node == NULL){
+		return 0;
+	}
+	return height(node->left) - height(node->right);
 }
 
-// Utility function to print in-order traversal
-void inOrder(Node *node){
-  if(node != NULL){
-    inOrder(node->left);
-    printf("%d: %s\n", node->key, node->taskName);
-    inOrder(node->right);
-  }
-}
-
-
+//	Function that gets inputs from the user
+//	Determines whether to insert/search tasks into/from AVL tree
 Node* getInputs(int n, Node *node){
-  int i = 0, state = 0, tempKey = 0;
-  char *tempName;
-  if(n == 0){
-    printf("No input\n");
-  }else{
-    for(i = 0; i < n; i++){
-      state = 0;
-      scanf("%d", &state);
-      
-      // Input sanitizer
-      while(state != 1 && state != 2){
-        scanf("%d", &state);
-      }
-  
-      if(state == 1){
-        tempName = (char *)malloc(sizeof(char) * 20);
-        scanf("%s %d", tempName, &tempKey);
-        node = insert(node, tempKey, tempName);
-        free(tempName);
-        tempName = NULL;
-      }else if(state == 2){
-        scanf("%d", &tempKey);
-        search(node, tempKey);        
-      }
-    }
-  }
-  // Print the sorted tree by keys
-  // printf("\nFinal Tree:\n");
-  // inOrder(node);
-  return node;
+	int i = 0, state = 0, tempKey = 0;
+	char *tempName;
+	if(n == 0){
+		printf("No input\n");
+	}else{
+		for(i = 0; i < n; i++){
+			state = 0;
+			scanf("%d", &state);
+	      
+		//	Input sanitizer
+			while(state != 1 && state != 2){
+				scanf("%d", &state);
+			}
+	  
+			if(state == 1){
+				tempName = (char *)malloc(sizeof(char) * 20);
+				scanf("%s %d", tempName, &tempKey);
+				node = insert(node, tempKey, tempName);
+				free(tempName);
+				tempName = NULL;
+			}else if(state == 2){
+				scanf("%d", &tempKey);
+				search(node, tempKey);        
+			}
+		}
+	}
+	return node;
 }
