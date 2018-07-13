@@ -4,11 +4,11 @@
 
 // AVL Tree node
 typedef struct Node{
-	int key;
-	char* taskName;
-	struct Node *left;
-	struct Node *right;
-	int height;
+  int key;
+  char* taskName;
+  struct Node *left;
+  struct Node *right;
+  int height;
 
 }Node;
 
@@ -24,28 +24,46 @@ Node * getInputs(int n, Node *node);
 void inOrder(Node *node);
 
 int main(){
-	int n = 0;
-	Node *root = NULL;
-	scanf("%d", &n);
+  int n = 0;
+  Node *root = NULL;
+  scanf("%d", &n);
   root = getInputs(n, root);
 
   inOrder(root);
 }
 
-// Create new node, malloc its memory, init its values
-Node *newNode(int key, char *string){
-  Node *node = (Node*)malloc(sizeof(Node));
-  node->taskName = (char *)malloc(sizeof(char) * 20);
-  node->key = key;
-  node->taskName = string;
-  node->left = NULL;
-  node->right = NULL;
-  node->height = 1;
-  printf("New task: %s Priority: %d\n", node->taskName, node->key);
+
+// Gets user from the inputs ******* HEAVY LIFTING *******
+Node* getInputs(int n, Node *node){
+  int i = 0, state = 0, tempKey = 0;
+  if(n == 0){
+    printf("No input\n");
+  }else{
+    for(i = 0; i < n; i++){
+      state = 0;
+      scanf("%d", &state);
+      
+      // Input sanitizer
+      while(state != 1 && state != 2){
+        scanf("%d", &state);
+      }
+  
+      if(state == 1){
+        char *tempName = (char *)malloc(sizeof(char) * 20);
+        scanf("%s %d", tempName, &tempKey);
+        node = insert(node, tempKey, tempName);
+        free(tempName);
+        tempName = NULL;
+      }else if(state == 2){
+        scanf("%d", &tempKey);
+        search(node, tempKey);        
+      }
+    }
+  }
   return node;
 }
 
-
+// 1
 // Function that inserts and balances new nodes simultaneously
 // Node Parameters: 19 char string, int priority
 Node *insert(Node *node, int key, char *string){
@@ -63,7 +81,7 @@ Node *insert(Node *node, int key, char *string){
   if(key < node->key){
     node->left = insert(node->left, key, string);
   }else if(key > node->key){
-    node->right = insert(node->right, key, string);
+  node->right = insert(node->right, key, string);
   }else{
     // return node;
   }
@@ -95,6 +113,8 @@ Node *insert(Node *node, int key, char *string){
     return node;
 }
 
+
+// 2
 Node *search(Node *node, int key){
   if(node == NULL){
     printf("NON-EXISTANT\n");
@@ -113,6 +133,27 @@ Node *search(Node *node, int key){
   }
   return node;
 }
+
+
+// Create new node, malloc its memory, init its values
+Node *newNode(int key, char *string){
+  Node *node = (Node*)malloc(sizeof(Node));
+  node->taskName = (char *)malloc(sizeof(char) * 20);
+  if(node->taskName == NULL){
+    return NULL;
+  }
+  node->key = key;
+  node->taskName = string;
+  node->left = NULL;
+  node->right = NULL;
+  node->height = 1;
+  printf("New task: %s Priority: %d\n", node->taskName, node->key);
+  return node;
+}
+
+
+
+
 
 
 // Utility function that rotates to the right
@@ -164,40 +205,13 @@ int getBal(Node *node){
 void inOrder(Node *node){
   if(node != NULL){
     inOrder(node->left);
-    printf("%d\n", node->key);
+    printf("%d:\t%s\n", node->key, node->taskName);
     inOrder(node->right);
   }
 }
 
 
-Node* getInputs(int n, Node *node){
-  int i = 0, state = 0, tempKey = 0;
-  if(n == 0){
-    printf("No input\n");
-  }else{
-    for(i = 0; i < n; i++){
-      state = 0;
-      scanf("%d", &state);
-      
-      // Input sanitizer
-      while(state != 1 && state != 2){
-        scanf("%d", &state);
-      }
-  
-      if(state == 1){
-        char *tempName = (char *)malloc(sizeof(char) * 20);
-        scanf("%s %d", tempName, &tempKey);
-        node = insert(node, tempKey, tempName);
-        free(tempName);
-        tempName = NULL;
-      }else if(state == 2){
-        scanf("%d", &tempKey);
-        search(node, tempKey);        
-      }
-    }
-  }
-  return node;
-}
+
 
 // --------------- Test Cases ---------------
 /*
