@@ -28,8 +28,6 @@ int main(){
 	Node *root = NULL;
 	scanf("%d", &n);
   root = getInputs(n, root);
-
-  inOrder(root);
 }
 
 // Create new node, malloc its memory, init its values
@@ -37,14 +35,13 @@ Node *newNode(int key, char *string){
   Node *node = (Node*)malloc(sizeof(Node));
   node->taskName = (char *)malloc(sizeof(char) * 20);
   node->key = key;
-  node->taskName = string;
+  strcpy(node->taskName, string);
   node->left = NULL;
   node->right = NULL;
   node->height = 1;
-  printf("New task: %s Priority: %d\n", node->taskName, node->key);
+  // printf("New task: %s Priority: %d\n", node->taskName, node->key);
   return node;
 }
-
 
 // Function that inserts and balances new nodes simultaneously
 // Node Parameters: 19 char string, int priority
@@ -52,6 +49,7 @@ Node *insert(Node *node, int key, char *string){
   // If node is empty, successfully add
   if(node == NULL){    
     printf("ADDED\n");
+    // printf("ADDED %d: %s\n", key, string);
     return newNode(key, string);
 
   }
@@ -164,7 +162,7 @@ int getBal(Node *node){
 void inOrder(Node *node){
   if(node != NULL){
     inOrder(node->left);
-    printf("%d\n", node->key);
+    printf("%d: %s\n", node->key, node->taskName);
     inOrder(node->right);
   }
 }
@@ -172,6 +170,7 @@ void inOrder(Node *node){
 
 Node* getInputs(int n, Node *node){
   int i = 0, state = 0, tempKey = 0;
+  char *tempName;
   if(n == 0){
     printf("No input\n");
   }else{
@@ -185,7 +184,7 @@ Node* getInputs(int n, Node *node){
       }
   
       if(state == 1){
-        char *tempName = (char *)malloc(sizeof(char) * 20);
+        tempName = (char *)malloc(sizeof(char) * 20);
         scanf("%s %d", tempName, &tempKey);
         node = insert(node, tempKey, tempName);
         free(tempName);
@@ -196,92 +195,8 @@ Node* getInputs(int n, Node *node){
       }
     }
   }
+  // Print the sorted tree by keys
+  // printf("\nFinal Tree:\n");
+  // inOrder(node);
   return node;
 }
-
-// --------------- Test Cases ---------------
-/*
-// Input
-15
-1 F 9 
-1 A 1
-1 I 7
-1 H 8
-1 D 4
-1 C 3
-1 E 5
-1 B 2
-1 J 6
-1 E 5
-2 3
-2 5
-2 10
-2 4
-2 3 
-
-// Output 
-
-ADDED
-ADDED
-ADDED
-ADDED
-ADDED
-ADDED
-ADDED
-ADDED
-ADDED
-REDUNDANT
-C
-E
-NON-EXISTANT
-D
-C
-
-
-// Case 2
-// Input
-13
-1 ProgramOne 1
-1 BoiledWater 2
-1 ColdFerret 3
-1 ProgramOne 1
-1 ProgramOne 1
-1 MoonsShadow 7
-1 ThatOtherProgram 6
-2 3
-2 5
-2 10
-2 4
-2 3
-2 2
-
-// Output
-ADDED
-ADDED
-ADDED
-REDUNDANT
-REDUNDANT
-ADDED
-ADDED
-ColdFerret
-NON-EXISTANT
-NON-EXISTANT
-NON-EXISTANT
-ColdFerret
-BoiledWater
-
-// Case 3
-1 2
-1 ProgramOne 1 
-2 1
-2 2
-2 100
-1 ProgramTwo 2
-2 1
-2 2
-2 100
-1 ProgramThree 100 
-2 1
-2 2
-2 100
-*/
